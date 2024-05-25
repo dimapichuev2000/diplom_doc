@@ -85,15 +85,16 @@ class PDFApp:
         return text
 
     def folderDistribution(self, probabilities):
+        self.text_widget.delete(1.0, tk.END)
         index = 0
         for probabilitie in probabilities:
             index = index + 1
             for category, prob in enumerate(probabilitie):
                 percent = prob * 100
                 if percent > 30.0:
-                    self.distribute_file(index, category, 'data/')
+                    self.distribute_file(index, category, 'data/',percent)
 
-    def distribute_file(self, index, category, base_path):
+    def distribute_file(self, index, category, base_path,percent):
         # Словарь с категориями и именами папок
         folders = {
             0: "Политика",
@@ -110,6 +111,7 @@ class PDFApp:
             print(f"Неправильная категория: {category}")
             return
         file_path = self.file_paths[index-1]
+        file_name = file_path.split('/')[-1]
         # Имя папки для данной категории
         folder_name = folders[category]
 
@@ -132,16 +134,17 @@ class PDFApp:
 
         # Перемещаем файл в папку назначения
         shutil.copy(file_path, destination_path)
+        self.text_widget.insert(tk.END, f"{file_name} - {folder_name}({category}) - {round(percent, 2)}%\n")
         print(f"Файл {file_path} перемещен в {destination_path}")
 
     def filter_files(self):
-        self.text_widget.delete(1.0, tk.END)
+        # self.text_widget.delete(1.0, tk.END)
         self.text_list.clear()
-        for file_path in self.file_paths:
-            file_name = file_path.split('/')[-1]
-            # Предположим, что процентная часть будет заполняться позже
-            percentage = "0%"
-            self.text_widget.insert(tk.END, f"{file_name}\t\t{percentage}\n")
+        # for file_path in self.file_paths:
+        #     file_name = file_path.split('/')[-1]
+        #     # Предположим, что процентная часть будет заполняться позже
+        #     percentage = "0%"
+        #     self.text_widget.insert(tk.END, f"{file_name}\t\t{percentage}\n")
 
         for file_path in self.file_paths:
             # Путь к входному файлу
@@ -157,7 +160,8 @@ class PDFApp:
             else:
                 print("Формат файла не поддерживается.")
 
-        model = load('model.pkl')
+        # model = load('model.pkl')
+        model = load('model_new.pkl')
         vectorizer = load('tfidf_vectorizer.pkl')
         scaler = load('scaler.pkl')
 
