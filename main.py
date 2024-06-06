@@ -31,13 +31,16 @@ class PDFApp:
 
         self.main_frame = ttk.Frame(root, padding=(20, 20, 20, 20))
         self.main_frame.pack(expand=True, fill=tk.BOTH)
+
         self.button_frame = ttk.Frame(self.main_frame)
         self.button_frame.pack(pady=10)
 
-        self.upload_button = ttk.Button(self.main_frame, text="Upload PDFs", command=self.upload_files)
-        self.upload_button.pack(pady=10)
-        self.filter_button = ttk.Button(self.button_frame, text="Filter", command=self.filter_files)
+
+        self.upload_button = ttk.Button(self.button_frame, text="Загрузка PDF", command=self.upload_files)
+        self.upload_button.pack(side=tk.LEFT, padx=5)
+        self.filter_button = ttk.Button(self.button_frame, text="Распределение", command=self.filter_files)
         self.filter_button.pack(side=tk.LEFT, padx=5)
+
 
         self.text_widget = tk.Text(self.main_frame, height=15)
         self.text_widget.pack(expand=True, fill=tk.BOTH, pady=10)
@@ -93,6 +96,14 @@ class PDFApp:
                 percent = prob * 100
                 if percent > 30.0:
                     self.distribute_file(index, category, 'data/',percent)
+
+    def toAcrhive(self):
+        archive_dir='archive'
+        os.makedirs(archive_dir, exist_ok=True)
+        for file_path in self.file_paths:
+            file_name = file_path.split('/')[-1]
+            new_path = os.path.join(archive_dir, file_name)
+            shutil.move(file_path,new_path)
 
     def distribute_file(self, index, category, base_path,percent):
         # Словарь с категориями и именами папок
@@ -199,6 +210,8 @@ class PDFApp:
         print(predicted_class)
         probabilities = model.predict_proba(df_scaler)
         self.folderDistribution(probabilities)
+        self.toAcrhive()
+
 
 
 def main():
